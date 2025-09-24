@@ -13,6 +13,7 @@ const recoveryPassword = document.getElementById('recovery-password');
 const gracePeriod = document.getElementById('grace-period');
 const resultMessage = document.getElementById('result-message');
 const submitButton = secretForm.querySelector('button');
+const titularAlertContact = document.getElementById('titular-alert-contact');
 
 // --- Form Logic ---
 secretForm.addEventListener('submit', async (event) => {
@@ -29,6 +30,7 @@ secretForm.addEventListener('submit', async (event) => {
     const beneficiary = beneficiaryContact.value;
     const password = recoveryPassword.value;
     const gracePeriodSeconds = parseInt(gracePeriod.value, 10);
+    const ownerEmail = titularAlertContact.value;
 
     // 2. Execute the entire cryptographic process from your diagram
     console.log('Initiating cryptographic process...');
@@ -40,7 +42,10 @@ secretForm.addEventListener('submit', async (event) => {
       ...cryptoPayload,
       beneficiaryContact: beneficiary,
       gracePeriodSeconds: gracePeriodSeconds,
+      titularAlertContact: ownerEmail,
     };
+    const fetchBody = JSON.stringify(apiPayload);
+    console.log('Fetch body string:', fetchBody);
 
     // 4. Send the encrypted data to the Posterit-E API
     console.log('Sending payload to the API...');
@@ -50,7 +55,7 @@ secretForm.addEventListener('submit', async (event) => {
         'Content-Type': 'application/json',
         'x-api-key': API_KEY,
       },
-      body: JSON.stringify(apiPayload),
+      body: fetchBody,
     });
 
     const responseData = await response.json();
