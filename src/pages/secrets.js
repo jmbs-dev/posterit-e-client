@@ -5,35 +5,35 @@ import { showRecoveryInstructionsModal } from '../components/RecoveryInstruction
 export function renderSecretsPage() {
   const app = document.getElementById('app');
   app.innerHTML = `
-    <h1>Posterit-E: Create a New Secret</h1>
-    <p>Securely and privately store your digital legacy.</p>
+    <h1>Posterit-E: Crear un Nuevo Secreto</h1>
+    <p>Almacena tu legado digital de forma segura y privada.</p>
     <form id="secret-form" style="max-width:700px;margin:auto;">
-      <h2>1. Your Secret</h2>
-      <p>Enter the information you want to protect. This can be text, passwords, keys, etc.</p>
-      <textarea id="secret-content" rows="8" placeholder="Paste your secret here..." required></textarea>
-      <h2>Owner Information</h2>
-      <p>Enter the email address of the secret owner. This is required for notifications and verification.</p>
-      <label for="titular-alert-contact">Owner's Email:</label>
-      <input type="email" id="titular-alert-contact" placeholder="owner@example.com" required>
-      <h2>2. The Beneficiary</h2>
-      <p>Who should receive this secret?</p>
-      <label for="beneficiary-contact">Beneficiary's Email:</label>
-      <input type="email" id="beneficiary-contact" placeholder="beneficiary@example.com" required>
-      <h2>3. Recovery Instructions</h2>
-      <p>Create a unique password for this secret. The beneficiary will need it to decrypt the content. <strong>Do not forget it; it cannot be recovered.</strong></p>
-      <label for="recovery-password">Recovery Password:</label>
+      <h2>1. Tu Secreto</h2>
+      <p>Ingresa la información que deseas proteger. Esto puede ser texto, contraseñas, claves, etc.</p>
+      <textarea id="secret-content" rows="8" placeholder="Pega tu secreto aquí..." required></textarea>
+      <h2>Información del Propietario</h2>
+      <p>Ingresa la dirección de correo electrónico del propietario del secreto. Esto es necesario para notificaciones y verificación.</p>
+      <label for="titular-alert-contact">Correo del Propietario:</label>
+      <input type="email" id="titular-alert-contact" placeholder="propietario@ejemplo.com" required>
+      <h2>2. El Beneficiario</h2>
+      <p>¿Quién debería recibir este secreto?</p>
+      <label for="beneficiary-contact">Correo del Beneficiario:</label>
+      <input type="email" id="beneficiary-contact" placeholder="beneficiario@ejemplo.com" required>
+      <h2>3. Instrucciones de Recuperación</h2>
+      <p>Crea una contraseña única para este secreto. El beneficiario la necesitará para desencriptar el contenido. <strong>No la olvides; no se puede recuperar.</strong></p>
+      <label for="recovery-password">Contraseña de Recuperación:</label>
       <input type="password" id="recovery-password" required>
-      <h2>4. Grace Period</h2>
-      <p>How long should pass after the beneficiary starts the recovery process before the secret is released? (This gives you time to cancel if it was a mistake).</p>
-      <label for="grace-period">Select a period:</label>
+      <h2>4. Período de Gracia</h2>
+      <p>¿Cuánto tiempo debe pasar después de que el beneficiario inicie el proceso de recuperación antes de que se libere el secreto? (Esto te da tiempo para cancelar si fue un error).</p>
+      <label for="grace-period">Selecciona un período:</label>
       <select id="grace-period" required>
-        <option value="2592000">30 days (Recommended)</option>
-        <option value="604800">7 days</option>
-        <option value="86400">1 day</option>
-        <option value="300">5 minutes (For testing)</option>
+        <option value="2592000">30 días (Recomendado)</option>
+        <option value="604800">7 días</option>
+        <option value="86400">1 día</option>
+        <option value="300">5 minutos (Para pruebas)</option>
       </select>
       <hr>
-      <button type="submit">Encrypt and Store Secret</button>
+      <button type="submit">Cifrar y Almacenar Secreto</button>
       <div id="result-message" style="margin-top:12px;"></div>
     </form>
   `;

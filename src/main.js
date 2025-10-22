@@ -1,14 +1,18 @@
 import Navigo from 'navigo';
 import { renderSecretsPage } from './pages/secrets.js';
 import { renderActivationPage } from './pages/activation.js';
+import { renderCancellationPage } from './pages/cancellation.js';
+import { renderMainPage } from './pages/main.js';
 import './style.css';
 
 // --- ROUTER ---
 const router = new Navigo('/', { hash: false });
 
 router.on({
+  '/': () => renderMainPage(),
   '/secret': () => renderSecretsPage(),
-  '/activation': () => renderActivationPage()
+  '/activation': () => renderActivationPage(),
+  '/cancel': () => renderCancellationPage()
 }).resolve();
 
 // Optional: handle internal navigation for anchor tags
