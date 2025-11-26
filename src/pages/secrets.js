@@ -84,7 +84,13 @@ export function renderSecretsPage() {
         },
         body: fetchBody,
       });
-      const responseData = await response.json();
+      let responseData = {};
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        try { responseData = await response.json(); } catch (e) { console.error('Error parsing secrets JSON:', e); }
+      } else {
+        try { const text = await response.text(); if (text) responseData.message = text; } catch (e) {}
+      }
       if (!response.ok) throw new Error(responseData.message || `Server Error: ${response.status}`);
       console.log('[Posterit-E] Secreto almacenado exitosamente:', responseData);
       lastSecretId = responseData.secretId;
@@ -100,22 +106,14 @@ export function renderSecretsPage() {
         recoveryPassword: lastRecoveryPassword,
         onClose: () => {}
       });
-      document.getElementById('show-instructions-btn').onclick = () => {
-        showRecoveryInstructionsModal({
-          secretId: lastSecretId,
-          recoveryPassword: lastRecoveryPassword,
-          onClose: () => {}
-        });
-      };
-      secretForm.reset();
-    } catch (error) {
-      console.error('[Posterit-E] Error en el proceso:', error);
-      resultMessage.innerText = `Error: ${error.message}`;
-      resultMessage.style.color = 'red';
-    } finally {
       submitButton.disabled = false;
-      submitButton.innerText = 'Guardar Secreto';
+      submitButton.innerText = 'Cifrar y Almacenar Secreto';
+    } catch (err) {
+      console.error('[Posterit-E] Error en el proceso de almacenamiento:', err);
+      resultMessage.innerHTML = `<strong>Error:</strong> ${err.message || 'Error de red. Por favor, inténtalo de nuevo.'}`;
       resultMessage.style.display = 'block';
+      submitButton.disabled = false;
+      submitButton.innerText = 'Cifrar y Almacenar Secreto';
     }
   });
 }

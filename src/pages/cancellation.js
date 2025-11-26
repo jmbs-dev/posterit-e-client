@@ -40,30 +40,6 @@ export function renderCancellationPage() {
       );
       // Log the full response for debugging
       console.log('Cancel API response:', response);
-      if (response.ok) {
-        // Try to parse JSON for a message if present
-        let data = {};
-        const contentType = response.headers.get('content-type') || '';
-        if (contentType.includes('application/json')) {
-          try {
-            data = await response.json();
-          } catch (e) {
-            console.error('Error parsing JSON response:', e);
-          }
-        } else {
-          try {
-            const text = await response.text();
-            if (text) data.message = text;
-          } catch (e) {}
-        }
-        btn.style.display = 'none';
-        status.innerHTML = `
-          <h2>Proceso cancelado exitosamente.</h2>
-          <p>${data.message ? data.message : 'El intento de recuperación ha sido detenido.'}</p>
-        `;
-        return;
-      }
-      // Only try to parse JSON if content-type is JSON and body is not empty
       let data = {};
       const contentType = response.headers.get('content-type') || '';
       if (contentType.includes('application/json')) {
@@ -73,13 +49,20 @@ export function renderCancellationPage() {
           console.error('Error parsing JSON response:', e);
         }
       } else {
-        // Try to get text for debugging
         try {
           const text = await response.text();
           if (text) data.message = text;
         } catch (e) {}
       }
-      status.innerHTML = `<strong>Error:</strong> ${data.message || 'El token es inválido o el proceso ya no puede ser cancelado.'}`;
+      if (response.ok) {
+        btn.style.display = 'none';
+        status.innerHTML = `
+          <h2>Proceso cancelado exitosamente.</h2>
+          <p>${data.message ? data.message : 'El intento de recuperación ha sido detenido.'}</p>
+        `;
+        return;
+      }
+      status.innerHTML = `<strong>Error:</strong> ${data.message || 'El token es inválido, no autorizado o el proceso ya no puede ser cancelado.'}`;
       btn.disabled = false;
     } catch (err) {
       // Log the error for debugging

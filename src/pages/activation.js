@@ -49,8 +49,25 @@ export function renderActivationPage() {
       const apiUrl = import.meta.env.VITE_API_URL;
       console.log('[Posterit-E] Solicitando saltCr para secretId:', secretId);
       const saltRes = await fetch(`${apiUrl}/activation/${secretId}`);
-      if (!saltRes.ok) throw new Error('No se pudo obtener la sal.');
-      const saltData = await saltRes.json();
+      let saltData = {};
+      const saltContentType = saltRes.headers.get('content-type') || '';
+      if (saltContentType.includes('application/json')) {
+        try { saltData = await saltRes.json(); } catch (e) { console.error('Error parsing salt JSON:', e); }
+      } else {
+        try { const text = await saltRes.text(); if (text) saltData.message = text; } catch (e) {}
+      }
+      if (!saltRes.ok) {
+        spinner.style.display = 'none';
+        submitBtn.disabled = false;
+        let errorMsg = saltData.message || '';
+        if (saltRes.status === 404) {
+          errorMsg = 'El ID del secreto no fue encontrado.';
+        } else if (!errorMsg) {
+          errorMsg = 'No se pudo obtener la sal.';
+        }
+        message.innerHTML = `<strong>Error:</strong> ${errorMsg}`;
+        return;
+      }
       const saltCr = saltData.saltCr;
       console.log('[Posterit-E] saltCr recibido:', saltCr);
       if (!saltCr) throw new Error('No se recibió la sal del servidor.');
@@ -85,10 +102,18 @@ export function renderActivationPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ secretId, clientHash })
       });
-      const verifyData = await verifyRes.json();
+      let verifyData = {};
+      const verifyContentType = verifyRes.headers.get('content-type') || '';
+      if (verifyContentType.includes('application/json')) {
+        try { verifyData = await verifyRes.json(); } catch (e) { console.error('Error parsing verify JSON:', e); }
+      } else {
+        try { const text = await verifyRes.text(); if (text) verifyData.message = text; } catch (e) {}
+      }
       if (!verifyRes.ok) {
-        console.error('[Posterit-E] Error en verificación:', verifyData);
-        throw new Error(verifyData.message || 'La contraseña es incorrecta.');
+        spinner.style.display = 'none';
+        submitBtn.disabled = false;
+        message.innerHTML = `<strong>Error:</strong> ${verifyData.message || 'La contraseña es incorrecta.'}`;
+        return;
       }
       console.log('[Posterit-E] Verificación exitosa:', verifyData);
       app.innerHTML = `
@@ -99,10 +124,9 @@ export function renderActivationPage() {
       `;
     } catch (err) {
       console.error('[Posterit-E] Error en el proceso de activación:', err);
-      message.textContent = err.message;
-      message.style.color = 'red';
       spinner.style.display = 'none';
       submitBtn.disabled = false;
+      message.innerHTML = `<strong>Error:</strong> ${err.message || 'Error de red. Por favor, inténtalo de nuevo.'}`;
     }
   });
 }

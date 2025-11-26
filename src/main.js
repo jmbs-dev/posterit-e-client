@@ -3,6 +3,7 @@ import { renderSecretsPage } from './pages/secrets.js';
 import { renderActivationPage } from './pages/activation.js';
 import { renderCancellationPage } from './pages/cancellation.js';
 import { renderMainPage } from './pages/main.js';
+import { renderOtpPage } from './pages/otp.js';
 import './style.css';
 
 // --- ROUTER ---
@@ -12,7 +13,8 @@ router.on({
   '/': () => renderMainPage(),
   '/secret': () => renderSecretsPage(),
   '/activation': () => renderActivationPage(),
-  '/cancel': () => renderCancellationPage()
+  '/cancel': () => renderCancellationPage(),
+  '/otp': () => renderOtpPage()
 }).resolve();
 
 // Optional: handle internal navigation for anchor tags
