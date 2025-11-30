@@ -13,8 +13,8 @@ export function renderOtpPage() {
       <label for="otp-value">Código OTP (6 dígitos)</label>
       <input type="text" id="otp-value" name="otp" pattern="\\d{6}" maxlength="6" minlength="6" placeholder="Ingrese el código OTP" required style="width:100%;margin-bottom:12px;" />
       <button type="submit" id="otp-submit">Verificar Identidad</button>
-      <div id="otp-status-message" style="margin-top:12px;"></div>
     </form>
+    <div id="otp-status-message" style="margin-top:12px;display:none;"></div>
   `;
 
   const form = document.getElementById('otp-form');
@@ -50,18 +50,26 @@ export function renderOtpPage() {
         body: JSON.stringify({ secretId, otp })
       });
       let data = {};
-      const contentType = response.headers.get('content-type') || '';
-      if (contentType.includes('application/json')) {
-        try { data = await response.json(); } catch (e) { console.error('Error parsing JSON response:', e); }
-      } else {
-        try { const text = await response.text(); if (text) data.message = text; } catch (e) {}
+      let rawText = '';
+      try {
+        rawText = await response.text();
+        try {
+          data = JSON.parse(rawText);
+        } catch (e) {
+          data = { message: rawText };
+        }
+      } catch (e) {
+        data = { message: '' };
       }
       if (response.ok) {
         form.style.display = 'none';
-        status.innerHTML = `<h2>Verificación exitosa</h2><p>${data.message || 'Recibirá un email con instrucciones para recuperar su secreto.'}</p>`;
+        // Always show a success message, fallback if missing
+        const successMsg = data.message && data.message.trim() ? data.message : 'Recibirá un email con instrucciones para recuperar su secreto.';
+        status.innerHTML = `<h2>Verificación exitosa</h2><p>${successMsg}</p>`;
+        status.style.display = 'block'; // Ensure the message is visible
         return;
       }
-      let errorMsg = data.message || '';
+      let errorMsg = data.message || rawText || '';
       if (response.status === 401) {
         errorMsg = 'El código OTP es incorrecto o ha expirado.';
       } else if (response.status === 404) {
@@ -70,6 +78,7 @@ export function renderOtpPage() {
         errorMsg = 'Error de verificación. Intente nuevamente.';
       }
       status.innerHTML = `<strong>Error:</strong> ${errorMsg}`;
+      status.style.display = 'block';
       submitBtn.disabled = false;
     } catch (err) {
       console.error('Network or fetch error:', err);
@@ -78,4 +87,3 @@ export function renderOtpPage() {
     }
   });
 }
-

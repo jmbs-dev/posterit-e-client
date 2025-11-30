@@ -31,6 +31,7 @@ export function renderSecretsPage() {
         <option value="604800">7 días</option>
         <option value="86400">1 día</option>
         <option value="300">5 minutos (Para pruebas)</option>
+        <option value="60">1 minuto (Para pruebas)</option>
       </select>
       <hr>
       <button type="submit">Cifrar y Almacenar Secreto</button>

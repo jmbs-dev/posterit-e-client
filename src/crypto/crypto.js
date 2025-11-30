@@ -56,6 +56,26 @@ async function encryptData(data, key) {
   return result.buffer;
 }
 
+function base64ToArrayBuffer(base64) {
+  const binary = window.atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+async function decryptData(encrypted, key) {
+  const encryptedBytes = new Uint8Array(base64ToArrayBuffer(encrypted));
+  const iv = encryptedBytes.slice(0, 12); // IV_BYTES = 12
+  const ciphertext = encryptedBytes.slice(12);
+  return await window.crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    ciphertext
+  );
+}
+
 export async function encryptAndPreparePayload(secret, recoveryPassword) {
   const dek = await window.crypto.subtle.generateKey(
     { name: 'AES-GCM', length: 256 },
@@ -78,4 +98,25 @@ export async function encryptAndPreparePayload(secret, recoveryPassword) {
     saltCr: arrayBufferToBase64(saltCr),
     passwordHashCr: arrayBufferToBase64(passwordHashCr),
   };
+}
+
+export async function decryptSecret(password, saltKekBase64, encryptedDekBase64, encryptedSecretBase64) {
+  // 1. Decode base64 to ArrayBuffer
+  const saltKek = new Uint8Array(base64ToArrayBuffer(saltKekBase64));
+  // 2. Derive KEK from password and saltKek
+  const kek = await deriveKeyFromPassword(password, saltKek, ['decrypt']);
+  // 3. Decrypt DEK
+  const exportedDekRaw = await decryptData(encryptedDekBase64, kek);
+  // 4. Import DEK
+  const dek = await window.crypto.subtle.importKey(
+    'raw',
+    exportedDekRaw,
+    { name: 'AES-GCM', length: 256 },
+    true,
+    ['decrypt']
+  );
+  // 5. Decrypt secret
+  const secretBuffer = await decryptData(encryptedSecretBase64, dek);
+  // 6. Convert ArrayBuffer to string
+  return new TextDecoder().decode(secretBuffer);
 }

@@ -4,6 +4,7 @@ import { renderActivationPage } from './pages/activation.js';
 import { renderCancellationPage } from './pages/cancellation.js';
 import { renderMainPage } from './pages/main.js';
 import { renderOtpPage } from './pages/otp.js';
+import { renderSecretsDataPage } from './pages/secrets_data.js';
 import './style.css';
 
 // --- ROUTER ---
@@ -14,7 +15,8 @@ router.on({
   '/secret': () => renderSecretsPage(),
   '/activation': () => renderActivationPage(),
   '/cancel': () => renderCancellationPage(),
-  '/otp': () => renderOtpPage()
+  '/otp': () => renderOtpPage(),
+  '/secrets/:secretId/data': () => renderSecretsDataPage()
 }).resolve();
 
 // Optional: handle internal navigation for anchor tags
